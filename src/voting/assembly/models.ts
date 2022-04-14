@@ -7,11 +7,14 @@ import {PersistentUnorderedMap, PersistentVector} from "near-sdk-core";
  */
 @nearBindgen
 export class Initiative {
+  public static max_length(): i32 { return 100 as i32 };
   public creator: AccountId
 
   public contributions: u128 = u128.Zero
 
-  constructor() {
+  constructor(
+      public description: string
+  ) {
     this.creator = Context.sender
   }
 

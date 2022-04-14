@@ -29,7 +29,7 @@ function init(owner: AccountId, allow_anonymous: bool = true): void
 /**
  * creates an initiative that users can vote for
  */
-function create_initiative(): u32
+function create_initiative(description: string): u32
 
 /**
  * votes for an initiative
@@ -41,11 +41,16 @@ function vote(initiative: u32): void
  */
 function list_votes(initiative: u32): void
 
+/**
+ * lists all votes and contributtions of an initiative
+ */
+function list_initiatives(): Array<Initiative>
+
 // ------------------------------------
 // owner methods
 // ------------------------------------
 /**
- * selects the winning initiative and transfer all the contributions to the initiative creator 
+ * selects the winning initiative and transfer all the contributions to the initiative creator
  */
 function finalize_voting(): void
 

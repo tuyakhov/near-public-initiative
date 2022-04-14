@@ -56,7 +56,7 @@ describe('New initiative', () => {
 
     it('has valid contributions and creator', () => {
         attachDeposit(2)
-        const index = voting.create_initiative()
+        const index = voting.create_initiative('Test 1')
         const new_initiative = initiatives()[index]
         expect(new_initiative).toBeTruthy()
         expect(new_initiative.contributions).toBe(u128.mul(ONE_NEAR, u128.from(2)))
@@ -64,7 +64,7 @@ describe('New initiative', () => {
     })
 
     it('is added to the list with no votes', () => {
-        const index = voting.create_initiative()
+        const index = voting.create_initiative('Test 2')
         expect(initiatives().length).toBe(1)
         expect(votes().contains(index)).toBeFalsy()
     })
@@ -78,7 +78,7 @@ describe('Voting', () => {
 
     it('records a vote and adds contributions', () => {
         attachDeposit(1)
-        const index = voting.create_initiative()
+        const index = voting.create_initiative('Test')
         voting.vote(index)
         expect(votes().contains(index)).toBeTruthy()
         // expect(voting.list_votes(index)).toBeTruthy()
@@ -96,8 +96,8 @@ describe('Finalize voting', () => {
         VMContext.setSigner_account_id(CREATOR_ACCOUNT_ID)
         attachBalance(5)
         attachDeposit(2)
-        const w_initiative = voting.create_initiative()
-        const l_initiative = voting.create_initiative()
+        const w_initiative = voting.create_initiative('Test W')
+        const l_initiative = voting.create_initiative('Test L')
 
         expect(Context.accountBalance).toBe(u128.mul(ONE_NEAR, u128.from(3)))
 
@@ -119,7 +119,7 @@ describe('Finalize voting', () => {
         expect(li_votes).toHaveLength(1)
 
         VMContext.setPredecessor_account_id(OWNER_ACCOUNT_ID)
-        attachBalance(3)
+        attachBalance(10)
         attachDeposit(3)
         voting.finalize_voting()
 

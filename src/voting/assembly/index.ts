@@ -19,11 +19,14 @@ export class Contract {
    * Creates an initiative with an initial amount of contributions
    */
   @mutateState()
-  create_initiative(): u32 {
+  create_initiative(description: string): u32 {
     const contribution = Context.attachedDeposit
     this.assert_contribution(contribution)
 
-    const new_initiative = new Initiative()
+    assert(description.length > 0, "Description length cannot be 0")
+    assert(description.length < Initiative.max_length(), "Description length is too long, must be less than " + Initiative.max_length().toString() + " characters.")
+
+    const new_initiative = new Initiative(description)
     new_initiative.add_contribution(contribution)
     initiatives.push(new_initiative)
     ContractPromiseBatch.create(Context.contractName)
@@ -66,6 +69,15 @@ export class Contract {
     return votes.getSome(initiative)
   }
 
+  list_initiatives(): Initiative[] {
+    const result = new Array<Initiative>();
+    for (let i = 0; i < initiatives.length; i++) {
+      const entry = initiatives[i]
+      result.push(entry)
+    }
+    return result
+  }
+
   /**
    * Initiative with the most contributions wins. All the funds are distributed to the initiative creator
    */
@@ -73,17 +85,23 @@ export class Contract {
   finalize_voting(): void {
     this.assert_owner()
 
-    let winningInitiative = initiatives[0]
-    for (let i = 1; i < initiatives.length; i++) {
+    let winningInitiative: Initiative = new Initiative('Empty')
+    let totalContributions = u128.Zero
+    for (let i = 0; i < initiatives.length; i++) {
       const initiative = initiatives[i]
       winningInitiative = u128.gt(initiative.contributions, winningInitiative.contributions) ? initiative : winningInitiative
+      totalContributions = u128.add(totalContributions, initiative.contributions)
+      initiative.contributions = u128.Zero
+      initiatives.replace(i, initiative)
     }
+
+    assert(winningInitiative.creator, "Couldn't determine the winner")
 
     const to_self = Context.contractName
     const to_creator = ContractPromiseBatch.create(winningInitiative.creator)
 
     // transfer earnings to owner then confirm transfer complete
-    const promise = to_creator.transfer(winningInitiative.contributions)
+    const promise = to_creator.transfer(totalContributions)
     promise.then(to_self).function_call("on_transfer_complete", '{}', u128.Zero, XCC_GAS)
   }
 
