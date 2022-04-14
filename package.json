@@ -10,14 +10,12 @@
     "build:release": "asb",
     "test": "yarn build:release && yarn test:unit && yarn test:simulate",
     "test:simulate": "cargo test -- --nocapture",
-    "clean": "rm -rf ./build && rm -rf ./neardev && rm -rf ./target",
-    "test:debug": "node --inspect-brk ./node_modules/.bin/asp"
+    "clean": "rm -rf ./build && rm -rf ./neardev && rm -rf ./target"
   },
   "keywords": [],
   "author": "hello@near.org",
   "license": "ISC",
-  "devDependencies": {},
-  "dependencies": {
-    "near-sdk-as": "^3.0.0"
+  "devDependencies": {
+    "near-sdk-as": "^3.1.0"
   }
 }

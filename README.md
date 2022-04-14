@@ -1,64 +1,99 @@
-# Sample
+# Public initiative voting app
 
-This repository includes a complete project structure for AssemblyScript contracts targeting the NEAR platform.
+Create an initiative, collect NEAR tokens for it and compete with other initiatives to win and get funded.
 
-The example here is very basic.  It's a simple contract demonstrating the following concepts:
-- a single contract
-- the difference between `view` vs. `change` methods
-- basic contract storage
+Users can vote for public initiatives by attaching NEAR tokens as contributions.
 
-The goal of this repository is to make it as easy as possible to get started writing unit and simulation tests for AssemblyScript contracts built to work with NEAR Protocol.
+The initiative with the most contributions wins and it's creator receives all the collected funds
+
+## Contract
+
+A simple contract that allows people to collect funds for public initiatives and decide which initiative should be implemented receive all the collected funds.
+
+```ts
+// ------------------------------------
+// contract initialization
+// ------------------------------------
+
+/**
+ * initialize contract with owner ID and other config data
+ *
+ * (note: this method is called "constructor" in the singleton contract code)
+ */
+function init(owner: AccountId, allow_anonymous: bool = true): void
+
+// ------------------------------------
+// public methods
+// ------------------------------------
+
+/**
+ * creates an initiative that users can vote for
+ */
+function create_initiative(): u32
+
+/**
+ * votes for an initiative
+ */
+function vote(initiative: u32): void
+
+/**
+ * lists all votes and contributtions of an initiative
+ */
+function list_votes(initiative: u32): void
+
+// ------------------------------------
+// owner methods
+// ------------------------------------
+/**
+ * selects the winning initiative and transfer all the contributions to the initiative creator 
+ */
+function finalize_voting(): void
+
+```
+
 
 ## Usage
 
-### Getting started
+### Development
 
-1. clone this repo to a local folder
-2. run `yarn`
-3. run `yarn test`
+To deploy the contract for development, follow these steps:
 
-### Top-level `yarn` commands
+1. clone this repo locally
+2. run `yarn` to install dependencies
+3. run `./scripts/1.dev-deploy.sh` to deploy the contract (this uses `near dev-deploy`)
 
-- run `yarn test` to run all tests
-  - (!) be sure to run `yarn build:release` at least once before:
-    - run `yarn test:unit` to run only unit tests
-    - run `yarn test:simulate` to run only simulation tests
-- run `yarn build` to quickly verify build status
-- run `yarn clean` to clean up build folder
+**Your contract is now ready to use.**
 
-### Other documentation
+To use the contract you can do any of the following:
 
-- Sample contract and test documentation
-  - see `/src/sample/README` for contract interface
-  - see `/src/sample/__tests__/README` for Sample unit testing details
+_Public scripts_
 
-- Sample contract simulation tests
-  - see `/simulation/README` for simulation testing
-
-
-## The file system
-
-Please note that boilerplate project configuration files have been ommitted from the following lists for simplicity.
-
-### Contracts and Unit Tests
-
-```txt
-src
-├── sample                        <-- sample contract
-│   ├── README.md
-│   ├── __tests__
-│   │   ├── README.md
-│   │   └── index.unit.spec.ts
-│   └── assembly
-│       └── index.ts
-└── utils.ts                      <-- shared contract code
+```sh
+2.create-initiative.sh    # create an initiative, need to attach NEAR tokens as an initial contribution
+3.vote-for-initiative.sh  # vote for an initiative by attaching NEAR tokens
+4.finalize-voting.sh      # select the initiative that has the most contributions and transfer to the creator
 ```
 
-### Helper Scripts
+_Owner scripts_
 
-```txt
-scripts
-├── 1.init.sh
-├── 2.run.sh
-└── README.md                     <-- instructions
+```sh
+o-report.sh             # generate a summary report of the contract state
+o-transfer.sh           # transfer received funds to the owner account
 ```
+
+### Production
+
+It is recommended that you deploy the contract to a subaccount under your MainNet account to make it easier to identify you as the owner
+
+1. clone this repo locally
+2. run `./scripts/x-deploy.sh` to rebuild, deploy and initialize the contract to a target account
+
+   requires the following environment variables
+   - `NEAR_ENV`: Either `testnet` or `mainnet`
+   - `OWNER`: The owner of the contract and the parent account.  The contract will be deployed to `thanks.$OWNER`
+
+3. run `./scripts/x-remove.sh` to delete the account
+
+   requires the following environment variables
+   - `NEAR_ENV`: Either `testnet` or `mainnet`
+   - `OWNER`: The owner of the contract and the parent account.  The contract will be deployed to `thanks.$OWNER`
