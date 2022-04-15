@@ -1,6 +1,6 @@
 # 🙋 Public initiative voting app
 
-Create an initiative, collect NEAR tokens for it and compete with other initiatives to win and get funded.
+Create an initiative, collect [NEAR](https://near.org/) tokens for it and compete with other initiatives to win and get funded.
 
 Users can vote for public initiatives by attaching NEAR tokens as contributions.
 
